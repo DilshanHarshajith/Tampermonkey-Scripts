@@ -1,0 +1,53 @@
+name: Sync README
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - "scripts/**"
+      - "*.user.js"
+      - "README.md"
+      - "package.json"
+      - ".github/workflows/sync-readme.yml"
+  pull_request:
+    paths:
+      - "docs/**"
+      - "scripts/**"
+      - "*.user.js"
+      - "README.md"
+      - "package.json"
+      - ".github/workflows/sync-readme.yml"
+  workflow_dispatch:
+
+jobs:
+  check:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node scripts/build-readme.mjs --check
+
+  sync:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node scripts/build-readme.mjs
+      - name: Commit generated README
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if ! git diff --quiet -- README.md; then
+            git add README.md
+            git commit -m "docs: sync README from docs/"
+            git push
+          fi

@@ -1,0 +1,11 @@
+{
+  "name": "tampermonkey-scripts",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A collection of useful Tampermonkey scripts with docs-driven README generation.",
+  "scripts": {
+    "docs:sync": "node scripts/build-readme.mjs",
+    "docs:check": "node scripts/build-readme.mjs --check"
+  }
+}
